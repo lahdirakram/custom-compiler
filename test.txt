@@ -1,0 +1,10 @@
+#TAB
+#BOUCLE
+#CALCUL
+PROGRAMME SII 
+{
+	INTEGER X || Y[10] || Z;
+	REAL O;
+	REAL CST A;
+	X:=4+6+5;
+}
