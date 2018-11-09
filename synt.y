@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include "synt.tab.h"
 #include "foncs.h"
+#include "quadr.h"
 int yylex();
 int yyerror();
 int nbligne=1;
@@ -80,7 +81,7 @@ AFFECTATION:  id {
 		else
 			strcpy(sauv_type,getType($1));
 	} 
-	':''='  ARITHMETIQUE ';' {strcpy(sauv_type,"N");}
+	':''='  ARITHMETIQUE ';' {strcpy(sauv_type,"N"); aff_R3(sauv_oper,$1);}
 ;
 ARITHMETIQUE: ARITHMETIQUE ADDSUB_OPR MULDIV | MULDIV 
 ;
@@ -88,7 +89,7 @@ MULDIV : MULDIV MULDIV_OPR OPND | OPND
 ;
 ADDSUB_OPR: '+' {aff_R1(sauv_oper,"+");} | '-' {aff_R1(sauv_oper,"-");}
 ;
-MULDIV_OPR : '*' | '/' 
+MULDIV_OPR : '*' {aff_R2(sauv_oper,"*");} | '/' {aff_R2(sauv_oper,"/");} 
 ;
 OPND : id {
 	if(estDeclare($1)==0)
@@ -126,7 +127,7 @@ OPND : id {
 	else
 		strcpy(sauv_type,"INT");
 
-	sprintf(temp,"%f",$1);
+	sprintf(temp,"%d",$1);
  	strcpy(sauv_oper,temp);
 	} 
  | '-' num_int {

@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "quadr.h"
 
 typedef struct
 {
@@ -18,9 +17,9 @@ TypeTS ts[100];
 
 // un compteur global pour la table de symbole
 int CpTabSym=0;
-int aff_cpt=0;	
-//une fonctione recherche: pour chercher est ce que l'entité existe ou non déjà dans la table de symbole.
-// i: l'entite existe dejà dans la table de symbole, et sa position est i, -1: l'entité n'existe pas dans la table de symbole.
+	
+//une fonctione recherche: pour chercher est ce que l'entitÃ© existe ou non dÃ©jÃ  dans la table de symbole.
+// i: l'entite existe dejÃ  dans la table de symbole, et sa position est i, -1: l'entitÃ© n'existe pas dans la table de symbole.
 
 int recherche(char entite[])
 {
@@ -34,7 +33,7 @@ i++;
 return -1;
 }
 
-//une fontion qui va insérer les entités de programme dans la table de symbole
+//une fontion qui va insÃ©rer les entitÃ©s de programme dans la table de symbole
 void inserer(char *entite, char *code, char *type,bool constan,int t)
 {
 
@@ -70,7 +69,7 @@ i++;
 
 
 
-// fonction qui change le type d'une etité une fois il va être reconu dans la syntaxe
+// fonction qui change le type d'une etitÃ© une fois il va Ãªtre reconu dans la syntaxe
 
 void insererType(char entite[], char type[])
 {
@@ -101,7 +100,7 @@ void insererPlusVar(int fin, int p[20], char type[])
 
 
 //////////////////////////////////////////////////////
-////Les routines sémantiques
+////Les routines sÃ©mantiques
 
 int doubleDeclaration (char entite[])
 {
@@ -109,14 +108,14 @@ int posEntite=recherche(entite);
 
 
 //printf ("\nposi %d\n",posEntite);
-if (strcmp(ts[posEntite].TypeEntite,"")==0) return 1;  // j'ai pas trouvé le type associé à l'entité dans le table de symbole et donc elle est pas encore déclarée
-else return 0; // le type de l'entité existe dejà dans la TS et donc c'est une double déclaration
+if (strcmp(ts[posEntite].TypeEntite,"")==0) return 1;  // j'ai pas trouvÃ© le type associÃ© Ã  l'entitÃ© dans le table de symbole et donc elle est pas encore dÃ©clarÃ©e
+else return 0; // le type de l'entitÃ© existe dejÃ  dans la TS et donc c'est une double dÃ©claration
 
 
 }
 
 
-// idf est declaré ou non
+// idf est declarÃ© ou non
 int estDeclare(char idf[20]){
 	int res=recherche(idf);
 	if(res == -1 ) return 0;
@@ -156,95 +155,3 @@ bool est_cst(char* idf){
 	}
 	return false;
 }
-
-
-
-//************************************ routine quadruplé
-
-void aff_R1(char* tc,char* op){
-	qdr qd;
-	char tempstr[100];
-	if (! isempty(top_Muldiv))
-	{
-		qd = pop(Muldiv,top_Muldiv);
-
-		//strcpy(quad[3],tc);
-		qd=ajour_quad(qd,2,tc);
-		sprintf(tempstr,"%d",aff_cpt);
-		//strcpy(quad[4],strcat("T",tempstr));
-		qd=ajour_quad(qd,2,tempstr);
-		aff_cpt++;
-
-		quad[qc]=qd;
-		qc++;
-
-
-
-		strcpy(qd.oper,op);
-		strcpy(qd.op1,qd.res);
-		strcpy(qd.op2,"");
-		strcpy(qd.res,"");
-		push(Addsub,top_Addsub,qd);
-
-	}else if(! isempty(top_Addsub))
-	{
-		qd = pop(Addsub,top_Addsub);
-
-		//strcpy(quad[3],tc);
-		qd=ajour_quad(qd,2,tc);
-		sprintf(tempstr,"%d",aff_cpt);
-		//strcpy(quad[4],strcat("T",tempstr));
-		qd=ajour_quad(qd,2,tempstr);
-		aff_cpt++;
-
-		quad[qc]=qd;
-		qc++;
-
-		strcpy(qd.oper,op);
-		strcpy(qd.op1,qd.res);
-		strcpy(qd.op2,"");
-		strcpy(qd.res,"");
-		push(Addsub,top_Addsub,qd);
-	}else{
-		strcpy(qd.oper,op);
-		strcpy(qd.op1,tc);
-		strcpy(qd.op2,"");
-		strcpy(qd.res,"");
-		push(Addsub,top_Addsub,qd);
-	}
-}
-// void aff_R2(char* tc,char* op){
-// 	if (! Pilevide(Muldiv))
-// 	{
-// 		quad = Depiler(Muldiv);
-// 		strcpy(quad[3],tc);
-// 		sprintf(tempstr,"%d",aff_cpt);
-// 		strcpy(quad[4],strcat("T",tempstr));
-// 		aff_cpt++;
-// 		quads[qc]=quad;
-// 		Empiler(Muldiv,{op,quad[4],NULL,NULL});
-// 	}else {
-// 		Empiler(Muldiv,{op,tc,NULL,NULL});
-// 	}
-// }
-// void aff_R3(char* tc){
-// 	while(! Pilevide(Muldiv)){
-// 		quad = Depiler(Muldiv);
-// 		strcpy(quad[3],tc);
-// 		sprintf(tempstr,"%d",aff_cpt);
-// 		strcpy(quad[4],strcat("T",tempstr));
-// 		aff_cpt++;
-// 		quads[qc]=quad;
-// 		Empiler(Addsub,{op,quad[4],NULL,NULL});
-// 	}
-// 	while(! Pilevide(Addsub)){
-// 		quad = Depiler(Addsub);
-// 		strcpy(quad[3],tc);
-// 		sprintf(tempstr,"%d",aff_cpt);
-// 		strcpy(quad[4],strcat("T",tempstr));
-// 		aff_cpt++;
-// 		quads[qc]=quad;
-// 		Empiler(Addsub,{op,quad[4],NULL,NULL});
-// 	}
-// 	quads[qc]={:=,quad[4],NULL,dest};
-// }
