@@ -7,5 +7,9 @@ PROGRAMME SII
 	REAL O;
 	REAL CST A;
 	
-	X:= 4 + 5 * 3 / 2 *8 /8 *7  + 5+6;
+	X:= 4 + (5 * (3 / (2 *8) /5)) *7  + (5+11*6);
+
+	WHILE(X > Z){ X := 3; }
+
+	EXECUT X := 5; IF( 3+5 == 9+6 )
 }

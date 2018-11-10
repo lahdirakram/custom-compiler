@@ -11,9 +11,11 @@ int yyerror();
 int nbligne=1;
 char sauv_type[7];
 char sauv_oper[20];
+char sauv_op[5][5];
 char temp[20];
 bool sauv_nature;
 int sauv_taille;
+bool imp_tab=false,imp_boucle=false,imp_calcul=false;
 %}
 
 %union {
@@ -34,7 +36,7 @@ char* str;
 
 S: BIBL mc_pgm id '{' DEC INSTS'}' { printf("Fin compilation \n");}
 ;
-BIBL : bib_tab BIBL | bib_boucle BIBL | bib_calcul BIBL | /* empty */
+BIBL : bib_tab BIBL {imp_tab=true;} | bib_boucle BIBL {imp_boucle=true;} | bib_calcul BIBL {imp_calcul=true;} | /* empty */
 ;
 DEC: DEC_VAR DEC| /* empty */
 ;
@@ -60,12 +62,17 @@ VAR: id TABL {
 	if(estDeclare($1)==1)
 		yyerror("Semantique","double declaration de ",$1);
 	else
-		inserer($1,"IDF",sauv_type,sauv_nature,sauv_taille);
+		if(sauv_taille > 1 && imp_tab == false){
+			yyerror("Semantique","la Bibliotheque TAB n'est pas importer ",$1);
+			YYACCEPT;
+		}else{
+			inserer($1,"IDF",sauv_type,sauv_nature,sauv_taille);
+		}
 	} 
 ;
 SUITE_VAR : sp_2bar LISTE_VAR | /* empty */
 ;
-TABL: '[' num_int ']' {sauv_taille= $2 } | /* empty */ {sauv_taille=1}
+TABL: '[' num_int ']' {sauv_taille= $2; } | /* empty */ {sauv_taille=1;}
 ;
 INSTS: INST INSTS | /* empty */
 ;
@@ -81,15 +88,17 @@ AFFECTATION:  id {
 		else
 			strcpy(sauv_type,getType($1));
 	} 
-	':''='  ARITHMETIQUE ';' {strcpy(sauv_type,"N"); aff_R3(sauv_oper,$1);}
+	':''='  ARITHMETIQUE ';' {strcpy(sauv_type,"N"); aff_R3(sauv_oper,$1,"");}
 ;
-ARITHMETIQUE: ARITHMETIQUE ADDSUB_OPR MULDIV | MULDIV 
+ARITHMETIQUE: {if(!imp_calcul){yyerror("Semantique","la Bibliotheque Calcul n'est pas importer","");YYACCEPT;}} ADDSUB  
 ;
-MULDIV : MULDIV MULDIV_OPR OPND | OPND
+ADDSUB : ADDSUB ADDSUB_OPR {aff_R1(sauv_oper,sauv_op[arithm_level]);} MULDIV | MULDIV
 ;
-ADDSUB_OPR: '+' {aff_R1(sauv_oper,"+");} | '-' {aff_R1(sauv_oper,"-");}
+MULDIV : MULDIV MULDIV_OPR {aff_R2(sauv_oper,sauv_op[arithm_level]);} OPND | OPND
 ;
-MULDIV_OPR : '*' {aff_R2(sauv_oper,"*");} | '/' {aff_R2(sauv_oper,"/");} 
+ADDSUB_OPR: '+' {strcpy(sauv_op[arithm_level],"+");} | '-' {strcpy(sauv_op[arithm_level],"-");}
+;
+MULDIV_OPR : '*' {strcpy(sauv_op[arithm_level],"*");} | '/' {strcpy(sauv_op[arithm_level],"/");} 
 ;
 OPND : id {
 	if(estDeclare($1)==0)
@@ -163,11 +172,11 @@ OPND : id {
  	sprintf(temp,"-%f",$2);
  	strcpy(sauv_oper,temp);
  	}
-  | '(' ARITHMETIQUE ')' | '-' '(' ARITHMETIQUE ')'
+  | '(' {arithm_level++;} ARITHMETIQUE ')' {aff_R3(sauv_oper,"",sauv_op[arithm_level-1]);} | '-' '(' {arithm_level++;} ARITHMETIQUE ')' {aff_R3(sauv_oper,"",sauv_op[arithm_level-1]);}
 ;
-BOUCLE: mc_while '(' CND ')''{' INSTS '}'
+BOUCLE: {if(!imp_boucle){yyerror("Semantique","la Bibliotheque BOUCLE n'est pas importer","while");YYACCEPT;}} mc_while '(' CND ')''{' INSTS '}' 
 ;
-CND: ARITHMETIQUE OPR_CMP ARITHMETIQUE {strcpy(sauv_type,"N");}
+CND: ARITHMETIQUE {aff_R3(sauv_oper,"Tcnd1","");} OPR_CMP ARITHMETIQUE {aff_R3(sauv_oper,"Tcnd2","");} {strcpy(sauv_type,"N");}
 ;
 OPR_CMP : '=''=' | '>' F_OPR_CMP | '<' F_OPR_CMP | '!''='
 ;

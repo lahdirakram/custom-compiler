@@ -63,7 +63,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 19 "synt.y"
+#line 21 "synt.y"
 
 int n_int;
 double n_double;

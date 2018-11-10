@@ -8,10 +8,10 @@ typedef struct qdr{
 
 int MAXSIZE = 1000;       
 qdr quad[1000];
-qdr Muldiv[1000],Addsub[1000];     
+qdr Muldiv[5][1000],Addsub[5][1000];     
 int qc=0;
-int top_Muldiv = -1 , top_Addsub= -1 ; 
-int aff_cpt=0;
+int top_Muldiv[5] = {-1,-1,-1,-1,-1} , top_Addsub[5]= {-1,-1,-1,-1,-1} ; 
+int aff_cpt=0,arithm_level=0;
 
 
 void quadr(char opr[],char op1[],char op2[],char res[])
@@ -89,27 +89,27 @@ void affiche_pile(qdr stack[1000],int *top,char * nom){
 
 
 //************************************ routine quadruplé
+void rout_fin_level(char * tc){
 
+}
 void aff_R1(char* tc,char* op){
-  affiche_pile(Muldiv,&top_Muldiv,"Muldiv");
-  affiche_pile(Addsub,&top_Addsub,"Addsub");
   qdr qd;
   char tempstr[100];
-  if (! isempty(top_Muldiv))
-  {
-    qd = pop(Muldiv,&top_Muldiv);
-    qd=ajour_quad(qd,2,tc);
-    sprintf(tempstr,"T%d",aff_cpt);
-    qd=ajour_quad(qd,3,tempstr);
+  if (! isempty(top_Muldiv[arithm_level]))
+    {
+      qd = pop(Muldiv[arithm_level],&top_Muldiv[arithm_level]);
+      qd=ajour_quad(qd,2,tc);
+      sprintf(tempstr,"T%d",aff_cpt);
+      qd=ajour_quad(qd,3,tempstr);
     aff_cpt++;
     quad[qc]=qd;
     qc++;
     strcpy(qd.oper,op);strcpy(qd.op1,qd.res);strcpy(qd.op2,"");strcpy(qd.res,"");
-    push(Addsub,&top_Addsub,qd);
+    push(Addsub[arithm_level],&top_Addsub[arithm_level],qd);
 
-  }else if(! isempty(top_Addsub))
+  }else if(! isempty(top_Addsub[arithm_level]))
   {
-    qd = pop(Addsub,&top_Addsub);
+    qd = pop(Addsub[arithm_level],&top_Addsub[arithm_level]);
     qd=ajour_quad(qd,2,tc);
     sprintf(tempstr,"T%d",aff_cpt);
     qd=ajour_quad(qd,3,tempstr);
@@ -120,20 +120,18 @@ void aff_R1(char* tc,char* op){
     strcpy(qd.op1,qd.res);
     strcpy(qd.op2,"");
     strcpy(qd.res,"");
-    push(Addsub,&top_Addsub,qd);
+    push(Addsub[arithm_level],&top_Addsub[arithm_level],qd);
   }else{
     strcpy(qd.oper,op);strcpy(qd.op1,tc);strcpy(qd.op2,"");strcpy(qd.res,"");
-    push(Addsub,&top_Addsub,qd);
+    push(Addsub[arithm_level],&top_Addsub[arithm_level],qd);
   }
 }
 void aff_R2(char* tc,char* op){
-  affiche_pile(Muldiv,&top_Muldiv,"Muldiv");
-  affiche_pile(Addsub,&top_Addsub,"Addsub");
   qdr qd;
   char tempstr[100];
-  if (! isempty(top_Muldiv))
+  if (! isempty(top_Muldiv[arithm_level]))
   {
-    qd = pop(Muldiv,&top_Muldiv);
+    qd = pop(Muldiv[arithm_level],&top_Muldiv[arithm_level]);
     qd=ajour_quad(qd,2,tc);
     sprintf(tempstr,"T%d",aff_cpt);
     qd=ajour_quad(qd,3,tempstr);
@@ -141,20 +139,18 @@ void aff_R2(char* tc,char* op){
     quad[qc]=qd;
     qc++;
     strcpy(qd.oper,op);strcpy(qd.op1,qd.res);strcpy(qd.op2,"");strcpy(qd.res,"");
-    push(Muldiv,&top_Muldiv,qd);
+    push(Muldiv[arithm_level],&top_Muldiv[arithm_level],qd);
 
   }else {
     strcpy(qd.oper,op);strcpy(qd.op1,tc);strcpy(qd.op2,"");strcpy(qd.res,"");
-    push(Muldiv,&top_Muldiv,qd);
+    push(Muldiv[arithm_level],&top_Muldiv[arithm_level],qd);
   }
 }
-void aff_R3(char* tc,char * dest){
-  affiche_pile(Muldiv,&top_Muldiv,"Muldiv");
-  affiche_pile(Addsub,&top_Addsub,"Addsub");
+void aff_R3(char* tc,char * dest,char * nextop){
   qdr qd;
   char tempstr[100];
-  while(! isempty(top_Muldiv)){
-    qd = pop(Muldiv,&top_Muldiv);
+  while(! isempty(top_Muldiv[arithm_level])){
+    qd = pop(Muldiv[arithm_level],&top_Muldiv[arithm_level]);
     qd = ajour_quad(qd,2,tc);
     sprintf(tempstr,"T%d",aff_cpt);
     qd=ajour_quad(qd,3,tempstr);
@@ -163,8 +159,8 @@ void aff_R3(char* tc,char * dest){
     qc++;
     strcpy(tc,tempstr);
   }
-  while(! isempty(top_Addsub)){
-    qd = pop(Addsub,&top_Addsub);
+  while(! isempty(top_Addsub[arithm_level])){
+    qd = pop(Addsub[arithm_level],&top_Addsub[arithm_level]);
     qd=ajour_quad(qd,2,tc);
     sprintf(tempstr,"T%d",aff_cpt);
     qd=ajour_quad(qd,3,tempstr);
@@ -173,7 +169,13 @@ void aff_R3(char* tc,char * dest){
     qc++;
     strcpy(tc,tempstr);
   }
-  strcpy(qd.oper,":=");strcpy(qd.op1,tc);strcpy(qd.op2,"");strcpy(qd.res,dest);
-  quad[qc]=qd;
-  qc++;
+  
+  if(arithm_level > 0){
+    arithm_level--;
+
+  }else{
+    strcpy(qd.oper,":=");strcpy(qd.op1,tc);strcpy(qd.op2,"");strcpy(qd.res,dest);
+    quad[qc]=qd;
+    qc++;
+  } 
 }
